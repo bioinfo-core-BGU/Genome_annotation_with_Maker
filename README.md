@@ -30,7 +30,7 @@ maker_opt.ctl - contains all other information for MAKER, including the location
 
 ## 1. RepeatMasker
 Many of the steps used by MAKER can be computationally demanding, we therefore initially perform a "clean" MAKER run, which includes only RepeatMasker.
-We need to build new maker configuration files and populate the appropriate values.
+We need to build new maker configuration files and populate the appropriate values at maker_opt.ctl.
 
 ```
 model_org=Crustacea
