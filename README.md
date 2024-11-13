@@ -24,13 +24,13 @@ This creates three files (type ls -1 to see).
 
 maker_exe.ctl - contains the path information for the underlying executables.
 
-maker_bopt.ctl - contains filtering statistics for BLAST and Exonerate
+maker_bopts.ctl - contains filtering statistics for BLAST and Exonerate
 
-maker_opt.ctl - contains all other information for MAKER, including the location of the input genome file.
+maker_opts.ctl - contains all other information for MAKER, including the location of the input genome file.
 
 ## 1. RepeatMasker
 Many of the steps used by MAKER can be computationally demanding, we therefore initially perform a "clean" MAKER run, which includes only RepeatMasker.
-We need to build new maker configuration files and populate the appropriate values in maker_opt.ctl
+We need to build new maker configuration files and populate the appropriate values in maker_opts.ctl
 
 `model_org=Crustacea`
 
