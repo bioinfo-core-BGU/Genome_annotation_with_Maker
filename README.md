@@ -23,7 +23,9 @@ This creates three files (type ls -1 to see).
 
 
 maker_exe.ctl - contains the path information for the underlying executables.
+
 maker_bopt.ctl - contains filtering statistics for BLAST and Exonerate
+
 maker_opt.ctl - contains all other information for MAKER, including the location of the input genome file.
 
 ## 1. RepeatMasker
