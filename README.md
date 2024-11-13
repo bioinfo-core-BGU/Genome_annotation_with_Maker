@@ -4,3 +4,7 @@
 Variations and Off-target Profiling", Genomics Proteomics & Bioinformatics.</p>
 
 <p>Code and documentation for genome annotation with Maker will be uploaded here soon.</p>
+
+## Citation
+
+## Prerequisites
