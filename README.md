@@ -95,8 +95,7 @@ less 02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff | \
 	awk '{print $5-$4}' \
 	> 02.Maker_Round1/Maker_Round1.maker.output/00.Maker_Round1_mRNA_stats.log
 
-python \
-	00.Scripts/mRNA_stats.py \
+python 00.Scripts/mRNA_stats.py \
 	02.Maker_Round1/Maker_Round1.maker.output/00.Maker_Round1_mRNA_stats.log
 	
 perl 00.Scripts/AED_cdf_generator.pl \
