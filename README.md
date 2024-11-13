@@ -3,7 +3,9 @@
 <p>This repository accompanies the article Wattad et al., "Roadmap and Considerations for Genome Editing in a Non-model Organism: Genetic
 Variations and Off-target Profiling", Genomics Proteomics & Bioinformatics.</p>
 
-<p>Code and documentation for genome annotation with Maker will be uploaded here soon.</p>
+<p>⚠️ Work in Progress</p>
+
+<p>The code and documentation for this repository are currently being uploaded and finalized gradually. Please note that changes and updates are ongoing, and the content may not yet be ready for full use. We will update this message once the repository is complete and ready for use. Thank you for your patience!</p>
 
 ## Citation
 
