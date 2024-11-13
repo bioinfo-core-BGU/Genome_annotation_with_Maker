@@ -57,8 +57,7 @@ awk '{ if ($0 == "##gff-version 3" || $2 == "repeatmasker") print $0 }' 01.Repea
 ```
 
 ## 2. Maker Round 1
-We now configure MAKER to generate annotations directly from EST and protein data, which will then be used for training ab initio gene predictors
-We again build new maker configuration files and populate the appropriate values.
+We now configure MAKER to generate annotations directly from EST and protein data, which will then be used for training ab initio gene predictors. We again build new maker configuration files and populate the appropriate values in maker_opts.ctl
 
 ```
 est=00.Files/macrobrachium_rosenbergii_assembly.fasta,00.Files/macrobrachium_rosenbergii_NCBI_mRNA.fasta
