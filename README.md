@@ -10,7 +10,7 @@ Variations and Off-target Profiling", Genomics Proteomics & Bioinformatics.</p>
 ## Prerequisites
 
 ## Usage
-we need to tell MAKER all the details about how we want the annotation process to proceed.
+We need to tell MAKER all the details about how we want the annotation process to proceed.
 Because there can be many variables and options involved in annotation, command line options would be too numerous and cumbersome.
 Instead MAKER uses a set of configuration files which guide each run.
 You can create a set of generic configuration files in the current working directory by typing the following
