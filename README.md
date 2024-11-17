@@ -99,6 +99,18 @@ less ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff | \
 	awk '{print $5-$4}' \
 	> ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_mRNA_stats.txt
 
+mRNA_file=~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_mRNA.gff
+est_file=~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_est2genome.gff
+protein_file=~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_protein2genome.gff
+awk \
+	-v mRNA_file=$mRNA_file \
+	-v est_file=$est_file \
+	-v protein_file=$protein_file \
+	'{ if ($2 == "maker") print $0 > mRNA_file; 
+	if ($2 ~ "est") print $0 > est_file; 
+	if ($2 ~ "protein") print $0 > protein_file }' \
+	~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff
+
 python ~/00.Scripts/mRNA_stats.py \
 	~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_mRNA_stats.txt
 	
@@ -115,4 +127,29 @@ maker2zff \
 	-l 50 \
 	~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff
 rename genome Maker_Round1_zff_length50_aed0.25 genome.*
+```
+
+## 3. BUSCO Round 1
+Next we evaluate the annotations derived from the first round of Maker using BUSCO. First, we extract the transcripts according to the mRNA gff file, then we run BUSCO in 'transcriptome' mode and visualize the results.
+```
+cd ~/03.BUSCO_Round1/
+awk -v OFS="\t" '{ if ($3 == "mRNA") print $1, $4, $5 }' ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_mRNA.gff \
+	> ~/03.BUSCO_Round1/Maker_Round1_transcripts_ranges.txt
+
+python ~/00.Scripts/merge_ranges.py \
+	~/03.BUSCO_Round1/Maker_Round1_transcripts_ranges.txt
+
+bedtools getfasta \
+	-fi ~/00.Files/Genome.fasta \
+	-bed ~/03.BUSCO_Round1/Maker_Round1_transcripts_ranges_merged.txt | \
+	> ~/03.BUSCO_Round1/Maker_Round1_transcripts.fasta
+
+busco \
+	-i ~/03.BUSCO_Round1/Maker_Round1_transcripts.fasta \
+	-o "BUSCO_Round1" \
+	-l "arthropoda_odb10" \
+	--download_path $AUGUSTUS_CONFIG_PATH \
+	-m transcriptome \
+	--update-data
+
 ```
