@@ -93,12 +93,6 @@ gff3_merge \
 	-d ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_master_datastore_index.log \
 	> ~/02.Maker_Round1/Maker_Round1_model_all.gff
 
-less ~/02.Maker_Round1/Maker_Round1_model_all.gff | \
-	awk '$3=="mRNA"' | \
-	grep "mRNA-1" | \
-	awk '{print $5-$4}' \
-	> ~/02.Maker_Round1/Maker_Round1_mRNA_stats.txt
-
 mRNA_file=~/02.Maker_Round1/Maker_Round1_model_mRNA.gff
 est_file=~/02.Maker_Round1/Maker_Round1_model_est2genome.gff
 protein_file=~/02.Maker_Round1/Maker_Round1_model_protein2genome.gff
@@ -110,6 +104,12 @@ awk \
 	if ($2 ~ "est") print $0 > est_file; 
 	if ($2 ~ "protein") print $0 > protein_file }' \
 	~/02.Maker_Round1/Maker_Round1_model_all.gff
+
+less ~/02.Maker_Round1/Maker_Round1_model_all.gff | \
+	awk '$3=="mRNA"' | \
+	grep "mRNA-1" | \
+	awk '{print $5-$4}' \
+	> ~/02.Maker_Round1/Maker_Round1_mRNA_stats.txt
 
 python ~/00.Scripts/mRNA_stats.py \
 	~/02.Maker_Round1/Maker_Round1_mRNA_stats.txt
