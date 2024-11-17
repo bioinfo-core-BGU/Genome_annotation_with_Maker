@@ -153,3 +153,43 @@ busco \
 	--out-path ~/03.BUSCO_Round1/
 
 ```
+
+## 4. Snap Round 1
+The basic steps for training Snap are first to filter the input gene models, then capture genomic sequence immediately surrounding each model locus, and finally uses those captured segments to produce the HMM. You can explore the internal Snap documentation for more details if you wish.
+
+```
+cd ~/04.Snap_Round1/
+mkdir ~/04.Snap_Round1/{00.logs,01.maker2zff,02.fathom,03.forge}
+cp ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_zff* ~/04.Snap_Round1/01.maker2zff/
+
+cd ~/04.Snap_Round1/02.fathom
+fathom \
+	~/04.Snap_Round1/01.maker2zff/Maker_Round1_zff_length50_aed0.25.ann \
+	~/04.Snap_Round1/01.maker2zff/Maker_Round1_zff_length50_aed0.25.dna \
+	-gene-stats \
+	> ~/04.Snap_Round1/00.logs/Maker_Round1_gene_stats.log
+fathom \
+	~/04.Snap_Round1/01.maker2zff/Maker_Round1_zff_length50_aed0.25.ann \
+	~/04.Snap_Round1/01.maker2zff/Maker_Round1_zff_length50_aed0.25.dna \
+	-validate \
+	> ~/04.Snap_Round1/00.logs/Maker_Round1_validate.log
+fathom \
+	-categorize 1000 \
+	~/04.Snap_Round1/01.maker2zff/Maker_Round1_zff_length50_aed0.25.ann \
+	~/04.Snap_Round1/01.maker2zff/Maker_Round1_zff_length50_aed0.25.dna
+fathom \
+	-export 1000 \
+	-plus \
+	~/04.Snap_Round1/01.maker2zff/Maker_Round1_zff_length50_aed0.25.ann \
+	~/04.Snap_Round1/01.maker2zff/Maker_Round1_zff_length50_aed0.25.dna
+
+cd ~/04.Snap_Round1/03.forge
+forge \
+	~/04.Snap_Round1/02.fathom/export.ann \
+	~/04.Snap_Round1/02.fathom/export.dna
+
+hmm-assembler.pl \
+	Maker_Round1_hmm \
+	~/04.Snap_Round1/03.forge/ \
+	> ~/04.Snap_Round1/Maker_Round1_zff_train_snap.hmm
+```
