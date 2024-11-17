@@ -72,6 +72,7 @@ protein2genome=1
 
 We then run MAKER:
 ```
+cd ~/02.Maker_Round1/
 maker \
 	-g 00.Files/Genome.fasta \
 	-base "Maker_Round1" \
