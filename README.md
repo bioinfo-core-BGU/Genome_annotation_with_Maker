@@ -148,7 +148,7 @@ busco \
 	-i ~/03.BUSCO_Round1/Maker_Round1_transcripts.fasta \
 	-o "BUSCO_Round1" \
 	-l "arthropoda_odb10" \
-	--download_path $AUGUSTUS_CONFIG_PATH \
+	--download_path ~/03.BUSCO_Round1/ \
 	-m transcriptome \
 	--out_path ~/03.BUSCO_Round1/
 
