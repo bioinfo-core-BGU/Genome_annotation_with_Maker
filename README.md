@@ -91,17 +91,17 @@ gff3_merge \
 	-n \
 	-s \
 	-d ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_master_datastore_index.log \
-	> ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff
+	> ~/02.Maker_Round1/Maker_Round1_model_all.gff
 
-less ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff | \
+less ~/02.Maker_Round1/Maker_Round1_model_all.gff | \
 	awk '$3=="mRNA"' | \
 	grep "mRNA-1" | \
 	awk '{print $5-$4}' \
-	> ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_mRNA_stats.txt
+	> ~/02.Maker_Round1/Maker_Round1_mRNA_stats.txt
 
-mRNA_file=~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_mRNA.gff
-est_file=~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_est2genome.gff
-protein_file=~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_protein2genome.gff
+mRNA_file=~/02.Maker_Round1/Maker_Round1_model_mRNA.gff
+est_file=~/02.Maker_Round1/Maker_Round1_model_est2genome.gff
+protein_file=~/02.Maker_Round1/Maker_Round1_model_protein2genome.gff
 awk \
 	-v mRNA_file=$mRNA_file \
 	-v est_file=$est_file \
@@ -109,15 +109,15 @@ awk \
 	'{ if ($2 == "maker") print $0 > mRNA_file; 
 	if ($2 ~ "est") print $0 > est_file; 
 	if ($2 ~ "protein") print $0 > protein_file }' \
-	~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff
+	~/02.Maker_Round1/Maker_Round1_model_all.gff
 
 python ~/00.Scripts/mRNA_stats.py \
-	~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_mRNA_stats.txt
+	~/02.Maker_Round1/Maker_Round1_mRNA_stats.txt
 	
 perl ~/00.Scripts/AED_cdf_generator.pl \
 	-b 0.025 \
-	~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff \
-	> ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_AED_dist.txt
+	~/02.Maker_Round1/Maker_Round1_model_all.gff \
+	> ~/02.Maker_Round1/Maker_Round1_AED_dist.txt
 ```
 
 In addition, to train SNAP, we need to convert the GFF3 gene models to ZFF format.
@@ -125,7 +125,7 @@ In addition, to train SNAP, we need to convert the GFF3 gene models to ZFF forma
 maker2zff \
 	-x 0.25 \
 	-l 50 \
-	~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff
+	~/02.Maker_Round1/Maker_Round1_model_all.gff
 rename genome Maker_Round1_zff_length50_aed0.25 genome.*
 ```
 
@@ -133,7 +133,7 @@ rename genome Maker_Round1_zff_length50_aed0.25 genome.*
 Next we evaluate the annotations derived from the first round of Maker using BUSCO. First, we extract the transcripts according to the mRNA gff file, then we run BUSCO in 'transcriptome' mode and visualize the results.
 ```
 cd ~/03.BUSCO_Round1/
-awk -v OFS="\t" '{ if ($3 == "mRNA") print $1, $4, $5 }' ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_mRNA.gff \
+awk -v OFS="\t" '{ if ($3 == "mRNA") print $1, $4, $5 }' ~/02.Maker_Round1/Maker_Round1_model_mRNA.gff \
 	> ~/03.BUSCO_Round1/Maker_Round1_transcripts_ranges.txt
 
 python ~/00.Scripts/merge_ranges.py \
@@ -160,7 +160,7 @@ The basic steps for training Snap are first to filter the input gene models, the
 ```
 cd ~/04.Snap_Round1/
 mkdir ~/04.Snap_Round1/{00.logs,01.maker2zff,02.fathom,03.forge}
-cp ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_zff* ~/04.Snap_Round1/01.maker2zff/
+cp ~/02.Maker_Round1/Maker_Round1_zff* ~/04.Snap_Round1/01.maker2zff/
 
 cd ~/04.Snap_Round1/02.fathom
 fathom \
