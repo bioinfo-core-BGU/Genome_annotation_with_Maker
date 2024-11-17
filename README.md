@@ -125,7 +125,7 @@ In addition, to train SNAP, we need to convert the GFF3 gene models to ZFF forma
 maker2zff \
 	-x 0.25 \
 	-l 50 \
-	~/02.Maker_Round1/Maker_Round1_model_all.gff
+	-d ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_master_datastore_index.log
 rename genome Maker_Round1_zff_length50_aed0.25 genome.*
 ```
 
