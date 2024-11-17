@@ -150,6 +150,6 @@ busco \
 	-l "arthropoda_odb10" \
 	--download_path $AUGUSTUS_CONFIG_PATH \
 	-m transcriptome \
-	--update-data
+	--out-path ~/03.BUSCO_Round1/
 
 ```
