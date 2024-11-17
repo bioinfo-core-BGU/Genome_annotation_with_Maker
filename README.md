@@ -93,19 +93,19 @@ gff3_merge \
 	-d ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_master_datastore_index.log \
 	> ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff
 
-less 02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff | \
+less ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff | \
 	awk '$3=="mRNA"' | \
 	grep "mRNA-1" | \
 	awk '{print $5-$4}' \
-	> 02.Maker_Round1/Maker_Round1.maker.output/00.Maker_Round1_mRNA_stats.log
+	> ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_mRNA_stats.txt
 
-python 00.Scripts/mRNA_stats.py \
-	02.Maker_Round1/Maker_Round1.maker.output/00.Maker_Round1_mRNA_stats.log
+python ~/00.Scripts/mRNA_stats.py \
+	~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_mRNA_stats.txt
 	
-perl 00.Scripts/AED_cdf_generator.pl \
+perl ~/00.Scripts/AED_cdf_generator.pl \
 	-b 0.025 \
-	02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff \
-	> 02.Maker_Round1/Maker_Round1.maker.output/00.Maker_Round1_AED_dist.log
+	~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff \
+	> ~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_AED_dist.txt
 ```
 
 In addition, to train SNAP, we need to convert the GFF3 gene models to ZFF format.
@@ -113,6 +113,6 @@ In addition, to train SNAP, we need to convert the GFF3 gene models to ZFF forma
 maker2zff \
 	-x 0.25 \
 	-l 50 \
-	02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff
+	~/02.Maker_Round1/Maker_Round1.maker.output/Maker_Round1_model_all.gff
 rename genome Maker_Round1_zff_length50_aed0.25 genome.*
 ```
