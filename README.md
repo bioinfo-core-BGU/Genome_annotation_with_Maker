@@ -193,3 +193,123 @@ hmm-assembler.pl \
 	~/04.Snap_Round1/03.forge/ \
 	> ~/04.Snap_Round1/Maker_Round1_zff_train_snap.hmm
 ```
+
+## Augustus Round 1
+Augustus is one of the best ab-initio gene predictors but also one of the hardest to train. In many cases, or as a first step towards modeling complete genes, it is sufficient to have only the coding parts of the gene structure (CDS). You will need a set of genomic sequences with gene structures (sequence coordinates of starts and ends of exons and genes) and the most important part is to select the right set of genes.
+
+We first start with creating a gene set for training
+```
+cd ~/05.Augustus_Round1/01.Gene_Set
+mkdir ~/05.Augustus_Round1/01.Gene_Set/{02.filter,03.protein,04.blast_recursive,05.nonredundant}
+
+# Split GFF by levels
+agat_sp_separate_by_record_type.pl \
+	--gff ~/02.Maker_Round1/Maker_Round1_model_mRNA.gff \
+	-o ~/05.Augustus_Round1/01.Gene_Set/01.splitByLevel
+	
+# Filter features by AED
+agat_sp_filter_feature_by_attribute_value.pl \
+	--gff ~/05.Augustus_Round1/01.Gene_Set/01.splitByLevel/mrna.gff \
+	--value 0.01 \
+	-a _AED \
+	-t ">=" \
+	-o ~/05.Augustus_Round1/01.Gene_Set/02.filter/codingGeneFeatures.filter.gff
+	
+# Keep longest isoform
+agat_sp_keep_longest_isoform.pl \
+	--gff ~/05.Augustus_Round1/01.Gene_Set/02.filter/codingGeneFeatures.filter.gff \
+	-o ~/05.Augustus_Round1/01.Gene_Set/02.filter/codingGeneFeatures.filter.longest_cds.gff
+	
+# Filter incomplete gene models
+agat_sp_filter_incomplete_gene_coding_models.pl \
+	--gff ~/05.Augustus_Round1/01.Gene_Set/02.filter/codingGeneFeatures.filter.longest_cds.gff \
+	-f ~/00.Files/Genome.fasta \
+	-o ~/05.Augustus_Round1/01.Gene_Set/02.filter/codingGeneFeatures.filter.longest_cds.complete.gff
+	
+# Filter genes by locus distance
+agat_sp_filter_by_locus_distance.pl \
+	--gff $JOB_DIR/02.filter/codingGeneFeatures.filter.longest_cds.complete.gff \
+	-d 1000 \
+	-o ~/05.Augustus_Round1/01.Gene_Set/02.filter/codingGeneFeatures.filter.longest_cds.complete.good_distance.gff
+	
+# Extract sequences
+agat_sp_extract_sequences.pl \
+	--gff ~/05.Augustus_Round1/01.Gene_Set/02.filter/codingGeneFeatures.filter.longest_cds.complete.good_distance.gff \
+	-f ~/00.Files/Genome.fasta \
+	--aa \
+	-o ~/05.Augustus_Round1/01.Gene_Set/03.protein/codingGeneFeatures.filter.longest_cds.complete.good_distance.proteins.fasta
+	
+# Make blast database
+makeblastdb \
+	-in ~/05.Augustus_Round1/01.Gene_Set/03.protein/codingGeneFeatures.filter.longest_cds.complete.good_distance.proteins.fasta \
+	-dbtype prot \
+	-out ~/05.Augustus_Round1/01.Gene_Set/03.protein/codingGeneFeatures.filter.longest_cds.complete.good_distance.proteins.database
+	
+# Proteins recursive blast
+blastp \
+	-query ~/05.Augustus_Round1/01.Gene_Set/03.protein/codingGeneFeatures.filter.longest_cds.complete.good_distance.proteins.fasta \
+	-db ~/05.Augustus_Round1/01.Gene_Set/03.protein/codingGeneFeatures.filter.longest_cds.complete.good_distance.proteins.database \
+	-outfmt 6 \
+	-out ~/05.Augustus_Round1/01.Gene_Set/04.blast_recursive/codingGeneFeatures.filter.longest_cds.complete.good_distance.proteins.blast
+	
+# Filter by mRNA best value
+agat_sp_filter_by_mrnaBlastValue.pl \
+	--gff ~/05.Augustus_Round1/01.Gene_Set/02.filter/codingGeneFeatures.filter.longest_cds.complete.good_distance.gff \
+	--blast ~/05.Augustus_Round1/01.Gene_Set/04.blast_recursive/codingGeneFeatures.filter.longest_cds.complete.good_distance.proteins.blast \
+	--outfile ~/05.Augustus_Round1/01.Gene_Set/05.nonredundant/codingGeneFeatures.nr.gff
+```
+
+We are now ready to train Augustus
+```
+cd ~/05.Augustus_Round1/02.Augustus_training
+mkdir ~/05.Augustus_Round1/02.Augustus_training/{01.genbank,02.etraining,03.optimize_augustus,04.improved_etraining}
+
+# Create genbank format
+gff2gbSmallDNA.pl \
+	~/05.Augustus_Round1/01.Gene_Set/05.nonredundant/codingGeneFeatures.nr.gff \
+	~/00.Files/Genome.fasta \
+	1000 \
+	~/05.Augustus_Round1/02.Augustus_training/01.genbank/codingGeneFeatures.gbk
+
+# Split genbank into testing set and training set (randomly)
+cd ~/05.Augustus_Round1/02.Augustus_training/01.genbank
+randomSplit.pl \
+	~/05.Augustus_Round1/02.Augustus_training/01.genbank/codingGeneFeatures.gbk \
+	100
+
+# Create new specie
+new_species.pl \
+	--species=macrobrachium_rosenbergii_r1
+	
+# Initial training
+etraining \
+	--species=macrobrachium_rosenbergii_r1 \
+	~/05.Augustus_Round1/02.Augustus_training/01.genbank/codingGeneFeatures.gbk.train
+	
+# Initial gene prediction
+augustus \
+	--species=macrobrachium_rosenbergii_r1 \
+	~/05.Augustus_Round1/02.Augustus_training/01.genbank/codingGeneFeatures.gbk.test \
+	> ~/05.Augustus_Round1/02.Augustus_training/02.etraining/first_prediction.log
+grep -A 22 Evaluation ~/05.Augustus_Round1/02.Augustus_training/02.etraining/first_prediction.log
+
+# Optimize augustus (may take long time to complete)
+cd ~/05.Augustus_Round1/02.Augustus_training/03.optimize_augustus
+optimize_augustus.pl \
+	--species=macrobrachium_rosenbergii_r1 \
+	--rounds=10 \
+	~/05.Augustus_Round1/02.Augustus_training/01.genbank/codingGeneFeatures.gbk.train \
+	> ~/05.Augustus_Round1/02.Augustus_training/03.optimize_augustus/optimization.log
+	
+# Secondary training
+etraining \
+	--species=macrobrachium_rosenbergii_r1 \
+	~/05.Augustus_Round1/02.Augustus_training/01.genbank/codingGeneFeatures.gbk.train
+	
+# Final gene prediction
+augustus \
+	--species=macrobrachium_rosenbergii_r1 \
+	~/05.Augustus_Round1/02.Augustus_training/01.genbank/codingGeneFeatures.gbk.test \
+	> ~/05.Augustus_Round1/02.Augustus_training/04.improved_etraining/final_prediction.log
+grep -A 22 Evaluation ~/05.Augustus_Round1/02.Augustus_training/04.improved_etraining/final_prediction.log
+```
